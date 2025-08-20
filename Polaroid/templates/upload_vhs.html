@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .upload-title {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .vhs-upload {
+    background: #1a1a1a;
+    padding: 20px;
+    border: 3px solid #5c66dc;
+    max-width: 500px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+  
+  .vhs-upload:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+  }
+  
+  .preview-container {
+    width: 100%;
+    height: 250px;
+    background: #000;
+    border: 2px dashed #5c66dc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  
+  .preview-video {
+    max-width: 100%;
+    max-height: 100%;
+    display: none; 
+  }
+  
+  .upload-icon {
+    font-size: 3rem;
+    color: #5c66dc;
+  }
+  
+  .vhs-caption {
+    margin-top: 15px;
+  }
+  
+  .btn-vhs {
+    background: #5c66dc;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+  }
+  
+  .btn-vhs:hover {
+    background: #7a82e0;
+  }
+  
+  .vhs-label {
+    color: #5c66dc;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+</style>
+
+<h2 class="upload-title">Crear VHS</h2>
+
+<div class="vhs-upload">
+  <form action="{{ url_for('crear_post') }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="vhs">
+    
+    <!-- Preview de video -->
+    <div class="preview-container" id="previewContainer">
+      <div id="uploadPrompt">
+        <span class="upload-icon">📼</span>
+        <div class="vhs-label">SELECCIONA TU VIDEO</div>
+      </div>
+      <video id="videoPreview" class="preview-video" controls></video>
+    </div>
+    
+    <!-- Input de archivo oculto -->
+    <input type="file" 
+           id="videoInput" 
+           name="file" 
+           accept="video/*" 
+           style="display: none;"
+           required
+           onchange="previewVideo(event)">
+    
+  
+    <div class="mb-3 text-center">
+      <button type="button" 
+              class="btn-vhs mb-3"
+              onclick="document.getElementById('videoInput').click()">
+        Elegir Video
+      </button>
+    </div>
+    
+ 
+    <div class="mb-3">
+      <textarea class="form-control vhs-caption" 
+                name="description" 
+                rows="3" 
+                placeholder="Describe tu video..."
+                required></textarea>
+    </div>
+    
+    <div class="text-center">
+      <button type="submit" class="btn-vhs">Crear VHS</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function previewVideo(event) {
+    const input = event.target;
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const previewVideo = document.getElementById('videoPreview');
+    
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const videoURL = URL.createObjectURL(file);
+      
+      previewVideo.src = videoURL;
+      previewVideo.style.display = 'block';
+      uploadPrompt.style.display = 'none';
+      
+      //Reproducir automáticamente al seleccionar
+      previewVideo.muted = true;
+      previewVideo.play();
+    }
+  }
+</script>
+{% endblock %}

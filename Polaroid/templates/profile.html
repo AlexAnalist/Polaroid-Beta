@@ -1,0 +1,781 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+
+
+.profile-container{
+  max-width: 935px;
+  margin: 30px auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+
+.profile-header {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.avatar-section {
+  position: relative; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.profile-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-middle {
+  margin: 5px 0;
+}
+
+.stats-container {
+  display: flex;
+  gap: 30px;
+}
+
+.bio-display {
+  position: absolute;
+  top: 35%;
+  width: 200%;
+  left: calc(120px + 10%);
+  max-width: 300px;
+  min-height: 100px;
+  background: none;
+  color: white;
+  font-family: 'Courier New', monospace;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  white-space: pre-wrap; 
+}
+
+.bio-edit {
+  position: absolute;
+  top: 60%;                   
+  left: calc(200px + 10%);   
+  width: 200%;
+  max-width: 500px;           
+  min-height: 100px;
+  background: #000;
+  color: white;
+  font-family: 'Courier New', monospace;
+  padding: 12px;
+  resize: vertical;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #6366f1;
+}
+
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 400px;
+}
+
+
+.profile-username {
+  font-family: 'Courier New', monospace;
+  color: white;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+
+.profile-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.profile-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+
+.profile-btn.primary {
+  background: #6366f1;
+  border: none;
+}
+
+
+.profile-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+
+.stat-item {
+  font-family: 'Courier New', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.stat-number {
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.stat-label {
+  font-size: 14px;
+}
+
+
+.avatar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 200px;
+}
+
+.upload-label {
+  background: #6366f1;
+  font-family: 'Courier New', monospace;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.upload-label:hover {
+  background: #4f46e5;
+}
+
+
+  .profile-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 15px;
+  }
+  
+  .profile-tab {
+    padding: 10px 25px;
+    background: #333;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-tab.active {
+    background: #5c66dc;
+  }
+  
+  /* Estilos Polaroid para fotos */
+  .polaroid-card {
+    background: white;
+    padding: 15px 15px 40px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-bottom: 30px;
+    transform: rotate(1deg);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .polaroid-card:nth-child(even) {
+    transform: rotate(-1deg);
+  }
+  
+  .polaroid-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+  
+  /* Estilos VHS para videos */
+  .vhs-card {
+    background: #1a1a1a;
+    padding: 15px;
+    border: 3px solid #5c66dc;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  
+  .vhs-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+  }
+  
+  .vhs-player {
+    width: 100%;
+    height: 250px;
+  }
+  
+  .vhs-player video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  
+  .post-caption {
+    margin-top: 15px;
+    font-family: 'Courier New', monospace;
+    padding: 0 10px;
+  }
+  
+  .post-author {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .post-author img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .content-section {
+    display: none;
+  }
+  
+
+  .post-interactions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding: 0 10px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+  }
+  
+  .vhs-card .post-interactions {
+    border-top: 1px solid #333;
+  }
+  
+  .like-btn, .comment-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .like-btn {
+    color: #333;
+  }
+  
+  .vhs-card .like-btn {
+    color: #fff;
+  }
+  
+  .like-btn.liked {
+    color: #ff0000;
+  }
+  
+  .comment-btn {
+    color: #333;
+  }
+  
+  .vhs-card .comment-btn {
+    color: #fff;
+  }
+  
+  .comments-section {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 5px;
+    display: none;
+  }
+  
+  .vhs-card .comments-section {
+    background: #333;
+    color: white;
+  }
+  
+  .comment {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .comment-author {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .comment-form {
+    display: flex;
+    margin-top: 10px;
+  }
+  
+  .comment-input {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .vhs-card .comment-input {
+    background: #222;
+    color: #fff;
+    border-color: #444;
+  }
+  
+  .comment-submit {
+    margin-left: 5px;
+    padding: 5px 10px;
+    background: #5c66dc;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+  }
+</style>
+
+<div class="profile-container">
+<div class="profile-header">
+  <!-- Columna izquierda: Avatar y botones -->
+  <div class="avatar-section">
+    <img src="{{ url_for('static', filename='avatars/' + user.avatar) if user.avatar else url_for('static', filename='avatars/default.jpg') }}"
+         alt="Avatar de {{ user.username }}"
+         class="profile-avatar">
+
+  <!-- Botones dinámicos -->
+  <div class="profile-buttons">
+    {% if current_user.username == user.username %}
+        <!-- Formulario para el dueño del perfil (avatar + bio) -->
+        <form method="POST" action="{{ url_for('edit_avatar') }}" enctype="multipart/form-data" class="avatar-form" onsubmit="return prepareFormBeforeSubmit()">
+            <input type="file" name="avatar" id="avatar-upload" accept="image/*" style="display: none;">
+            <label for="avatar-upload" class="upload-label">Cambiar foto</label>
+            <textarea name="bio" id="bioInput" class="bio-edit" rows="3" placeholder="Escribe tu biografía aquí...">{{ user.bio }}</textarea>
+            <button type="submit" class="upload-label">Actualizar</button>
+        </form>
+    {% else %}
+        <!-- Para otros usuarios -->
+        <div class="bio-display">
+            {% if user.bio %}
+                {{ user.bio }}
+            {% else %}
+                <p class="no-bio">Este usuario no tiene biografía</p>
+            {% endif %}
+        </div>
+        
+        <!-- Botones de seguir y mensaje -->
+        <div class="visitor-buttons">
+           <button class="upload-label follow-btn {% if current_user.is_following(user) %}primary{% endif %}" 
+           data-user-id="{{ user.id }}"
+           data-initial-state="{{ 'following' if current_user.is_following(user) else 'not-following' }}">
+            {% if current_user.is_following(user) %}Siguiendo{% else %}Seguir{% endif %}
+          </button>
+        <a href="{{ url_for('messenger', contact_id=user.id) }}" 
+          class="upload-label"
+          data-user-id="{{ user.id }}">
+       <i class="fas fa-envelope"></i> Mensaje
+       </a>
+        </div>
+    {% endif %}
+  </div>
+</div>
+
+ <!-- Info + Bio + Botones -->
+  <div class="profile-main">
+    <div class="profile-top">
+      <h1 class="profile-username">{{ user.username }}</h1>
+      
+      
+    </div>
+
+   <div class="stats-container">
+   <div class="stat-item">
+    <span class="stat-number">{{ user.posts|length }}</span>
+    <span class="stat-label">Publicaciones</span>
+   </div>
+   <div class="stat-item">
+    <span class="stat-number">{{ user.followers.count() }}</span>
+    <span class="stat-label">Seguidores</span>
+   </div>
+   <div class="stat-item">
+    <span class="stat-number">{{ user.followed.count() }}</span> 
+    <span class="stat-label">Siguiendo</span>
+   </div>
+ </div>
+
+  </div>
+</div>
+</div>
+
+<div class="profile-tabs">
+  <div class="profile-tab active" data-target="user-posts">Mis Publicaciones</div>
+  <div class="profile-tab" data-target="friends-posts">Compartidas</div>
+</div>
+
+<div id="user-posts" class="content-section" style="display: block;">
+  <div class="row">
+    {% for post in user_posts %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        {% if post.post_type == 'image' %}
+          <div class="polaroid-card">
+            <img src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}" 
+                 class="polaroid-img" 
+                 alt="{{ post.description }}">
+            <p class="post-caption">{{ post.description }}</p>
+            <div class="post-author">
+              <img src="{{ url_for('static', filename='avatars/' ~ post.author.avatar) if post.author.avatar else url_for('static', filename='avatars/default.jpg') }}">
+              <span>@{{ post.author.username }}</span>
+            </div>
+            
+            <!-- Interacciones -->
+            <div class="post-interactions">
+              <button class="like-btn {% if current_user in post.likes %}liked{% endif %}" 
+                      data-post-id="{{ post.id }}">
+                ❤️ {{ post.likes.count()}} Me gusta
+              </button>
+              <button class="comment-btn" data-post-id="{{ post.id }}">
+                💬 {{ post.comments.count() }} Comentarios
+              </button>
+            </div>
+            
+            <!-- Sección de comentarios -->
+            <div class="comments-section" id="comments-{{ post.id }}">
+              {% for comment in post.comments %}
+                <div class="comment">
+                  <span class="comment-author">@{{ comment.author.username }}:</span>
+                  <span>{{ comment.text }}</span>
+                </div>
+              {% endfor %}
+              {% if current_user.is_authenticated %}
+                <form class="comment-form" data-post-id="{{ post.id }}">
+                  <input type="text" class="comment-input" placeholder="Añade un comentario..." required>
+                  <button type="submit" class="comment-submit">Publicar</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="vhs-card">
+            <div class="vhs-player">
+              <video controls>
+                <source src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}">
+              </video>
+            </div>
+            <p class="post-caption" style="color: #fff;">{{ post.description }}</p>
+            <div class="post-author" style="color: #aaa;">
+              <img src="{{ url_for('static', filename='avatars/' ~ post.author.avatar) if post.author.avatar else url_for('static', filename='avatars/default.jpg') }}">
+              <span>@{{ post.author.username }}</span>
+            </div>
+            
+            <!-- Interacciones -->
+            <div class="post-interactions">
+              <button class="like-btn {% if current_user in post.likes %}liked{% endif %}" 
+                      data-post-id="{{ post.id }}">
+                ❤️ {{ post.likes.count()}} Me gusta
+              </button>
+              <button class="comment-btn" data-post-id="{{ post.id }}">
+                💬 {{ post.comments.count()}} Comentarios
+              </button>
+            </div>
+            
+            <!-- Sección de comentarios -->
+            <div class="comments-section" id="comments-{{ post.id }}">
+              {% for comment in post.comments %}
+                <div class="comment" style="color: #fff;">
+                  <span class="comment-author">@{{ comment.author.username }}:</span>
+                  <span>{{ comment.text }}</span>
+                </div>
+              {% endfor %}
+              {% if current_user.is_authenticated %}
+                <form class="comment-form" data-post-id="{{ post.id }}">
+                  <input type="text" class="comment-input" placeholder="Añade un comentario..." required>
+                  <button type="submit" class="comment-submit">Publicar</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!--Reservado para las publicaciones compartidas con amigos-->>
+<div id="friends-posts" class="content-section">
+  <div class="row">
+    {% for post in friends_posts %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        {% if post.post_type == 'image' %}
+          <div class="polaroid-card">
+            <img src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}" 
+                 class="polaroid-img" 
+                 alt="{{ post.description }}">
+            <p class="post-caption">{{ post.description }}</p>
+            <div class="post-author">
+              <img src="{{ url_for('static', filename='avatars/' ~ post.author.avatar) if post.author.avatar else url_for('static', filename='avatars/default.jpg') }}">
+              <span>@{{ post.author.username }}</span>
+            </div>
+            
+            <!-- Interacciones -->
+            <div class="post-interactions">
+              <button class="like-btn {% if current_user in post.likes %}liked{% endif %}" 
+                      data-post-id="{{ post.id }}">
+                ❤️ {{ post.likes.count()}} Me gusta
+              </button>
+              <button class="comment-btn" data-post-id="{{ post.id }}">
+                💬 {{ post.comments.count() }} Comentarios
+              </button>
+            </div>
+            
+            <!-- Sección de comentarios -->
+            <div class="comments-section" id="comments-{{ post.id }}">
+              {% for comment in post.comments %}
+                <div class="comment">
+                  <span class="comment-author">@{{ comment.author.username }}:</span>
+                  <span>{{ comment.text }}</span>
+                </div>
+              {% endfor %}
+              {% if current_user.is_authenticated %}
+                <form class="comment-form" data-post-id="{{ post.id }}">
+                  <input type="text" class="comment-input" placeholder="Añade un comentario..." required>
+                  <button type="submit" class="comment-submit">Publicar</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="vhs-card">
+            <div class="vhs-player">
+              <video controls>
+                <source src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}">
+              </video>
+            </div>
+            <p class="post-caption" style="color: #fff;">{{ post.description }}</p>
+            <div class="post-author" style="color: #aaa;">
+              <span>@{{ post.author.username }}</span>
+            </div>
+            
+            <!-- Interacciones -->
+            <div class="post-interactions">
+              <button class="like-btn {% if current_user in post.likes %}liked{% endif %}" 
+                      data-post-id="{{ post.id }}">
+                ❤️ {{ post.likes.count()}} Me gusta
+              </button>
+              <button class="comment-btn" data-post-id="{{ post.id }}">
+                💬 {{ post.comments.count()}} Comentarios
+              </button>
+            </div>
+            
+            <!-- Sección de comentarios -->
+            <div class="comments-section" id="comments-{{ post.id }}">
+              {% for comment in post.comments %}
+                <div class="comment" style="color: #fff;">
+                  <span class="comment-author">@{{ comment.author.username }}:</span>
+                  <span>{{ comment.text }}</span>
+                </div>
+              {% endfor %}
+              {% if current_user.is_authenticated %}
+                <form class="comment-form" data-post-id="{{ post.id }}">
+                  <imput type="text" class="comment-input" placeholder="Añade un comentario..." required>
+                  <button type="submit" class="comment-submit" id="submit-btn-{{post.id}}">Publicar</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+
+  //
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    const elementos = document.querySelectorAll('.profile-tab');
+    const secciones = document.querySelectorAll('.content-section');
+    
+    elementos.forEach(elemento => {
+      elemento.addEventListener('click', function() {
+        elementos.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const target = this.dataset.target;
+        secciones.forEach(seccion => {
+          seccion.style.display = section.id === target ? 'block' : 'none';
+        });
+      });
+    });
+
+    // Función para el botón seguir 
+  document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+       const userId = btn.dataset.userId;
+       const action = btn.textContent.trim() === 'Seguir' ? 'follow' : 'unfollow';
+
+     try {
+      const response = await fetch(`/follow/${userId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action})
+      });
+
+      if (response.ok) {
+        btn.textContent = action === 'follow' ? 'Siguiendo' : 'Seguir';
+        btn.classList.toggle('primary', action === 'follow');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+});
+
+// Funcion para el boton de mensajes 
+document.querySelectorAll('.message-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const userId = this.dataset.userId;
+    // Abrir modal de mensajes o redirección
+    console.log("Mensaje para usuario:", userId);
+  });
+});
+    
+   
+    
+    // Funcion del boton de los likes
+    document.querySelectorAll('.like-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        const isLiked = this.classList.contains('liked');
+        
+        fetch(`/like_post/${postId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            this.classList.toggle('liked');
+            const likeCount = parseInt(this.textContent.match(/\d+/)[0]);
+            this.innerHTML = this.classList.contains('liked') ? 
+              `❤️ ${likeCount + 1} Me gusta` : `❤️ ${likeCount - 1} Me gusta`;
+          }
+        });
+      });
+    });
+    
+  //Funcion para Boton de comentarios 
+  document.querySelectorAll('.comment-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        commentsSection.style.display = commentsSection.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+
+  //Funcion formulario para los comentarios
+  document.querySelectorAll('.comment-form').forEach(form => {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const postId = this.dataset.postId;
+    const input = this.querySelector('.comment-input');
+    const commentText = input.value.trim();
+
+    // Validación básica
+    if (!commentText) {
+      alert('El comentario no puede estar vacío');
+      input.focus();
+      return;
+    }
+
+    try {
+      const formData = new FormData(this); // Captura todos los campos del formulario, incluido el CSRF
+      formData.append('text', commentText); // Asegura que el campo 'text' esté incluido
+
+      const response = await fetch(`/add_comment/${postId}`, {
+        method: 'POST',
+        body: formData // Envía como FormData (multipart/form-data)
+      });
+
+      if (!response.ok) throw new Error('Error en el servidor');
+
+      const data = await response.json();
+
+      if (!data.success) throw new Error(data.error || 'Error al publicar');
+
+      // Limpiar el input y actualizar la UI
+      input.value = '';
+      const commentsSection = document.getElementById(`comments-${postId}`);
+      
+      if (commentsSection) {
+        const newComment = document.createElement('div');
+        newComment.className = 'comment';
+        newComment.innerHTML = `
+          <span class="comment-author">@${data.comment.author}:</span>
+          <span>${data.comment.text}</span>
+        `;
+        commentsSection.insertBefore(newComment, form);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al publicar el comentario: ' + error.message);
+    }
+  });
+});
+});
+</script>
+{% endblock %}

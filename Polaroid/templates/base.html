@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Polaroid</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="icon" href="{{ url_for('static', filename='icono.png') }}" type="image/png">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos de Bootstrap  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    body { 
+      background-color: #000000;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .navbar {
+      background-color: #5c66dc !important;
+      border-bottom: 1px solid #555;
+    }
+    
+    .btn-primary {
+    background-color:  #000000b1;
+    }
+
+.btn-primary:hover, 
+.btn-primary:focus {
+  background-color: #a8effaad;
+}
+
+
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+      font-family: 'Courier New', monospace;
+      color: white !important;
+    }
+    
+    
+    .btn-up {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      padding: 0 10px;
+    }
+    
+    .btn-logout {
+      background: transparent;
+      border: none;
+      color: #ff6b6b;
+      font-size: 1.5rem;
+      padding: 0 10px;
+    }
+    
+    .avatar-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 10px;
+      border: 2px solid white;
+    }
+
+    .alert-polaroid {
+      background: white;
+      border-left: 5px solid #333;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+
+    .search-container {
+      position: relative;
+      margin-right: 15px;
+    }
+
+    #searchUser {
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: none;
+      width: 200px;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    #searchUser:focus {
+      outline: none;
+      background-color: rgba(255, 255, 255, 0.3);
+      width: 250px;
+    }
+
+    #searchUser::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+
+    .suggestions-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: absolute;
+      background: white;
+      border: 1px solid #ddd;
+      width: 100%;
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none;
+      top: 100%;
+      left: 0;
+    }
+
+    .suggestions-list li {
+      padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s;
+    }
+
+    .suggestions-list li:hover {
+      background-color: #f8f9fa;
+    }
+
+    .suggestions-list li img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .suggestions-list li .username {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .no-results {
+      padding: 10px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('index') }}">Polaroid</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="d-flex ms-auto align-items-center">
+          {% if current_user.is_authenticated %}
+          
+            <div class="search-container">
+              <input type="text" id="searchUser" placeholder="Buscar usuario..." autocomplete="off">
+              <ul id="suggestions" class="suggestions-list"></ul>
+            </div>
+            <div class="dropdown" style="display: inline-block;">
+              <button class="btn btn-link text-dark p-0" 
+              data-bs-toggle="dropdown"
+              style="font-size: 2rem; line-height: 1; background: none; border: none;">
+            +
+             </button>
+           <ul class="dropdown-menu">
+           <li><a class="dropdown-item" href="{{ url_for('upload_polaroid') }}">📷 Subir Polaroid</a></li>
+           <li><a class="dropdown-item" href="{{ url_for('upload_vhs') }}">📼 Subir VHS</a></li>
+          </ul>
+          </div>
+            <a href="{{ url_for('profile', username=current_user.username) }}">
+              <img src="{{ url_for('static', filename='avatars/' + current_user.avatar) if current_user.avatar else url_for('static', filename='avatars/default.jpg') }}"
+                   class="avatar-img"
+                   alt="Avatar">
+            </a>
+            <a class="btn-logout" href="{{ url_for('logout') }}" title="Cerrar sesión">
+              <i class="bi bi-x-circle"></i>
+            </a>
+          {% else %}
+            <a class="btn btn-outline-light me-2" href="{{ url_for('login') }}">Iniciar sesión</a>
+            <a class="btn btn-primary" href="{{ url_for('register') }}">Registrarse</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-polaroid alert-dismissible fade show">
+          {{ messages[0] }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Bootstrap JS Bundle con Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchUser');
+      const suggestionsList = document.getElementById('suggestions');
+      
+      // Función para buscar usuarios
+      const searchUsers = debounce(async (query) => {
+        if (!query) {
+          suggestionsList.style.display = 'none';
+          return;
+        }
+        
+        try {
+          const response = await fetch(`/sugerencias_usuario?q=${encodeURIComponent(query)}`);
+          const data = await response.json();
+          
+          suggestionsList.innerHTML = '';
+          
+          if (data.length === 0) {
+            const noResults = document.createElement('li');
+            noResults.className = 'no-results';
+            noResults.textContent = 'No se encontraron usuarios';
+            suggestionsList.appendChild(noResults);
+          } else {
+            data.forEach(user => {
+              const li = document.createElement('li');
+              li.innerHTML = `
+                <img src="/static/avatars/${user.avatar || 'default.jpg'}" alt="${user.username}">
+                <span class="username">${user.username}</span>
+              `;
+              li.addEventListener('click', () => {
+                window.location.href = `/profile/${encodeURIComponent(user.username)}`;
+              });
+              suggestionsList.appendChild(li);
+            });
+          }
+          
+          suggestionsList.style.display = 'block';
+        } catch (error) {
+          console.error('Error al buscar usuarios:', error);
+          suggestionsList.style.display = 'none';
+        }
+      }, 300);
+      
+      // Event listeners
+      searchInput.addEventListener('input', (e) => {
+        searchUsers(e.target.value.trim());
+      });
+      
+      // Ocultar sugerencias al hacer clic fuera
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+          suggestionsList.style.display = 'none';
+        }
+      });
+      
+      // Mostrar sugerencias al hacer focus
+      searchInput.addEventListener('focus', () => {
+        if (suggestionsList.innerHTML !== '') {
+          suggestionsList.style.display = 'block';
+        }
+      });
+      
+      // Función para mejorar rendimiento
+      function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      }
+    });
+  </script>
+</body>
+</html>

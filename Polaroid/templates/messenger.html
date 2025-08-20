@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="header">
+        <h2>{{ contact.username }}</h2>
+    </div>
+
+    <div id="chatContainer" class="chat-container">
+        <!-- Aqui se cargan los mensajes  -->
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Escribe tu mensaje...">
+        <button id="sendBtn">Enviar</button>
+    </div>
+
+    <style>
+        .header {
+            border-bottom: 2px dashed #5c66dc;
+            color: #5c66dc ;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .chat-container {
+            height: 60vh;
+            overflow-y: auto;
+            border: 1px solid #5c66dc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message-received {
+            align-self: flex-start;
+            max-width: 70%;
+        }
+        .message-sent {
+            align-self: flex-end;
+            max-width: 70%;
+        }
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 5px;
+            position: relative;
+        }
+        .message-received .message-bubble {
+            background-color: #33284f;
+            border: 1px solid #5c66dc;
+            color: #5c66dc;
+        }
+        .message-sent .message-bubble {
+            background-color: #33284f;
+            border: 1px solid #5c66dc;
+            color: #5c66dc;
+            text-align: right;
+        }
+        .message-time {
+            font-size: 0.7em;
+            color: #888;
+            display: block;
+            margin-top: 3px;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        #messageInput {
+            flex-grow: 1;
+            background-color: #000;
+            color: #5c66dc;
+            border: 1px solid #5c66dc;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        #sendBtn {
+            background-color: #5c66dc;
+            color: #000;
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        // Variables desde Jinja
+        const contactId = "{{ contact.id }}";
+        const currentUserId = "{{ current_user.id }}";
+
+        // Cargar historial de mensajes
+        async function loadMessages() {
+            try {
+                const response = await fetch(`/api/get_dms/${contactId}`);
+                if (!response.ok) throw new Error('Error al cargar mensajes');
+
+                const messages = await response.json();
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.innerHTML = '';
+                
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = msg.sender_id === currentUserId ? 'message-sent' : 'message-received';
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-bubble">
+                            <p>${msg.content}</p>
+                            <span class="message-time">${msg.timestamp || ''}</span>
+                        </div>
+                    `;
+                    
+                    chatContainer.appendChild(messageDiv);
+                });
+                
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } catch (error) {
+                console.error('Error al cargar mensajes:', error);
+            }
+        }
+
+        // Enviar nuevo mensaje
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            
+            if (!content) {
+                alert('El mensaje no puede estar vacío');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/send_dm', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recipient_id: contactId,
+                        content: content
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al enviar mensaje');
+                }
+
+                input.value = '';
+                await loadMessages();
+            } catch (error) {
+                console.error('Error al enviar:', error);
+                alert(error.message);
+            }
+        });
+
+        // Iniciar chat
+        loadMessages();
+        setInterval(loadMessages, 5000); // Actualizar cada 5 segundos
+    </script>
+{% endblock %}

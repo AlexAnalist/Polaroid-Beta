@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .upload-title {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .polaroid-upload {
+    background: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    max-width: 500px;
+    margin: 0 auto 40px;
+    transform: rotate(-1deg);
+  }
+  
+  .preview-container {
+    width: 100%;
+    height: 250px;
+    background: #f9f9f9;
+    border: 2px dashed #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    display: none;
+  }
+  
+  .upload-icon {
+    font-size: 3rem;
+    color: #ccc;
+  }
+  
+  .polaroid-caption {
+    margin-top: 15px;
+  }
+  
+  .btn-upload {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .btn-upload:hover {
+    background: #555;
+  }
+</style>
+
+<h2 class="upload-title">Crear Polaroid</h2>
+
+<div class="polaroid-upload">
+  
+  <form action="{{ url_for('crear_post') }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="type" value="polaroid">
+    <!-- Previa de Polaroid -->
+    <div class="preview-container" id="previewContainer">
+      <div id="uploadPrompt">
+        <span class="upload-icon">📷</span>
+      </div>
+      <img id="imagePreview" class="preview-image">
+    </div>
+    
+    <!-- Input de archivo oculto -->
+    <input type="file" 
+           id="imageInput" 
+           name="file" 
+           accept="image/*" 
+           style="display: none;"
+           required
+           onchange="previewImage(event)">
+    
+ 
+    <div class="mb-3 text-center">
+      <button type="button" 
+              class="btn-upload mb-3"
+              onclick="document.getElementById('imageInput').click()">
+        Elegir Foto
+      </button>
+    </div>
+    
+  
+    <div class="mb-3">
+      <textarea class="form-control polaroid-caption" 
+                name="description" 
+                rows="3" 
+                placeholder="Escribe tu mensaje aquí..."
+                required></textarea>
+    </div>
+    
+    <div class="text-center">
+      <button type="submit" class="btn-upload">Crear Polaroid</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function previewImage(event) {
+    const input = event.target;
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const previewImage = document.getElementById('imagePreview');
+    
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewImage.style.display = 'block';
+        uploadPrompt.style.display = 'none';
+      }
+      
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+{% endblock %}

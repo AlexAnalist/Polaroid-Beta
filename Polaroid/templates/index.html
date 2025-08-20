@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .content-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  
+  .content-tab {
+    padding: 10px 30px;
+    margin: 0 10px;
+    background: #333;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+  }
+  
+  .content-tab.active {
+    background: #5c66dc;
+    transform: scale(1.05);
+  }
+
+  /* Contenedor principal */
+  .content-section {
+    display: none;
+  }
+  
+  /* Estilo Polaroid mejorado */
+  .polaroid-card {
+    background: white;
+    padding: 15px 15px 40px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: rotate(1deg);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  
+  .polaroid-card:nth-child(even) {
+    transform: rotate(-1deg);
+  }
+  
+  .polaroid-card:hover {
+    transform: rotate(0deg) scale(1.03);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  }
+  
+  .polaroid-img-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+  }
+  
+  .polaroid-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+  
+  .polaroid-caption {
+    margin-top: 15px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    color: #333;
+    padding: 0 15px;
+  }
+  
+  .polaroid-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .polaroid-author img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 8px;
+    object-fit: cover;
+  }
+
+  /* Estilo VHS mejorado */
+  .vhs-card {
+    background: #0f0f0f;
+    padding: 15px 15px 25px;
+    border: 3px solid #444;
+    margin-bottom: 30px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transform: rotate(-1deg);
+    transition: all 0.3s ease;
+  }
+  
+  .vhs-card:nth-child(even) {
+    transform: rotate(1deg);
+  }
+  
+  .vhs-card:hover {
+    transform: rotate(0deg) scale(1.02);
+  }
+  
+  .vhs-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, 
+      #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+  }
+  
+  .vhs-player {
+    width: 100%;
+    height: 250px;
+    background: #000;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+  }
+  
+  .vhs-player video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .vhs-label {
+    color: #f0f0f0;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    margin-top: 10px;
+    padding: 0 10px;
+  }
+  
+  .vhs-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+  
+  .vhs-author img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 8px;
+    object-fit: cover;
+  }
+</style>
+
+<div class="content-switcher">
+  <div class="content-tab active" data-content="polaroids">Polaroids</div>
+  <div class="content-tab" data-content="vhs">VHS</div>
+</div>
+
+<!-- Contenedor Polaroids -->
+<div id="polaroids-content" class="content-section">
+  <div class="row">
+    {% for post in posts|reverse %}
+      {% if post.post_type == 'image' %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="polaroid-card">
+          <div class="polaroid-img-container">
+            <img src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}" 
+                 class="polaroid-img" 
+                 alt="{{ post.description }}">
+          </div>
+          <p class="polaroid-caption">{{ post.description }}</p>
+          <div class="polaroid-author">
+            <img src="{{ url_for('static', filename='avatars/' ~ post.author.avatar) if post.author.avatar else url_for('static', filename='avatars/default.jpg') }}" 
+                 alt="{{ post.author.username }}">
+            <span>@{{ post.author.username }}</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Contenedor VHS -->
+<div id="vhs-content" class="content-section" style="display: none;">
+  <div class="row">
+    {% for post in posts|reverse %}
+      {% if post.post_type == 'video' %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="vhs-card">
+          <div class="vhs-player">
+            <video controls>
+              <source src="{{ url_for('static', filename='uploads/' ~ post.file_path) }}" type="video/mp4">
+            </video>
+          </div>
+          <p class="vhs-label">{{ post.description }}</p>
+          <div class="vhs-author">
+            <img src="{{ url_for('static', filename='avatars/' ~ post.author.avatar) if post.author.avatar else url_for('static', filename='avatars/default.jpg') }}" 
+                 alt="{{ post.author.username }}">
+            <span>@{{ post.author.username }}</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.content-tab');
+    const sections = document.querySelectorAll('.content-section');
+    
+    // Mostrar Polaroids
+    document.getElementById('polaroids-content').style.display = 'block';
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Cambiar pestañas activas
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Mostrar sección correspondiente
+        const contentType = this.dataset.content;
+        sections.forEach(section => {
+          section.style.display = section.id === `${contentType}-content` ? 'block' : 'none';
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}
